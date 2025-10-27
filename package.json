@@ -1,5 +1,5 @@
 {
-  "name": "@arkturian/typescript-utils",
+  "name": "arkturian-typescript-utils",
   "version": "1.0.0",
   "description": "Arkturian TypeScript utilities including animated properties and vector math",
   "type": "module",
