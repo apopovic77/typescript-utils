@@ -27,6 +27,10 @@
   ],
   "author": "Arkturian",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apopovic77/typescript-utils.git"
+  },
   "dependencies": {
     "three": "^0.180.0"
   },
