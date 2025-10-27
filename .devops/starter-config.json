@@ -1,0 +1,17 @@
+{
+  "BACKUP_PREFIX": "typescript-utils",
+  "BUILD_COMMAND": "npm run build",
+  "DEPLOY_PATH": "/var/www/typescript-utils",
+  "DEV_BRANCH": "dev",
+  "INSTALL_DEPS_COMMAND": "npm ci",
+  "MAIN_BRANCH": "main",
+  "NODE_VERSION": "20",
+  "PROJECT_NAME": "TypeScript Utils",
+  "PROJECT_SLUG": "typescript-utils",
+  "PROJECT_TYPE": "npm",
+  "REPO_ROOT": "/Volumes/DatenAP/Code/typescript-utils",
+  "SITE_URL": "https://example.com",
+  "STARTER_PATH": "/Volumes/DatenAP/Code/github-starterpack",
+  "WEB_GROUP": "www-data",
+  "WEB_USER": "www-data"
+}

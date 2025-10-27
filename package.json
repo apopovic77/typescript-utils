@@ -1,0 +1,33 @@
+{
+  "name": "@arkturian/typescript-utils",
+  "version": "1.0.0",
+  "description": "Arkturian TypeScript utilities including animated properties and vector math",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "test": "echo 'No tests configured yet' && exit 0",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "typescript",
+    "animation",
+    "properties",
+    "interpolation",
+    "vector",
+    "easing"
+  ],
+  "author": "Arkturian",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^24.9.1",
+    "@types/three": "^0.180.0",
+    "three": "^0.180.0",
+    "typescript": "^5.6.0"
+  },
+  "files": [
+    "dist",
+    "src"
+  ]
+}
