@@ -27,10 +27,12 @@
   ],
   "author": "Arkturian",
   "license": "MIT",
+  "dependencies": {
+    "three": "^0.180.0"
+  },
   "devDependencies": {
     "@types/node": "^24.9.1",
     "@types/three": "^0.180.0",
-    "three": "^0.180.0",
     "typescript": "^5.6.0"
   },
   "files": [
