@@ -2,8 +2,15 @@
   "name": "@arkturian/typescript-utils",
   "version": "1.0.0",
   "description": "Arkturian TypeScript utilities including animated properties and vector math",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
