@@ -7,8 +7,8 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-REPO_ROOT="/Volumes/DatenAP/Code/typescript-utils"
-BUILD_COMMAND="npm run build"
+REPO_ROOT="{{REPO_ROOT}}"
+BUILD_COMMAND="{{BUILD_COMMAND}}"
 
 usage() {
   cat <<'USAGE'
