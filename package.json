@@ -1,7 +1,7 @@
 {
-  "name": "@arkturian/typescript-utils",
-  "version": "1.0.0",
-  "description": "Arkturian TypeScript utilities including animated properties and vector math",
+  "name": "@apopovic77/typescript-utils",
+  "version": "1.0.1",
+  "description": "TypeScript utilities including InterpolatedProperty, Vector math, Quaternions, and Easing functions",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,16 +17,30 @@
     "test": "echo 'No tests configured yet' && exit 0",
     "prepublishOnly": "npm run build"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apopovic77/typescript-utils.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "typescript",
     "animation",
     "properties",
     "interpolation",
     "vector",
-    "easing"
+    "easing",
+    "field-aware",
+    "self-organizing",
+    "3d-engine"
   ],
-  "author": "Arkturian",
+  "author": "Alex Popovic <alex@arkturian.com>",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/apopovic77/typescript-utils/issues"
+  },
+  "homepage": "https://github.com/apopovic77/typescript-utils#readme",
   "devDependencies": {
     "@types/node": "^24.9.1",
     "@types/three": "^0.180.0",
@@ -35,6 +49,8 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "README.md",
+    "LICENSE"
   ]
 }
