@@ -1,10 +1,10 @@
-# @apopovic77/typescript-utils
+# arkturian-typescript-utils
 
 **TypeScript utilities for animated properties, vector math, and field-aware systems.**
 
 Built for production use in 3D engines, data visualization, and interactive applications.
 
-[![npm version](https://img.shields.io/npm/v/@apopovic77/typescript-utils.svg)](https://www.npmjs.com/package/@apopovic77/typescript-utils)
+[![npm version](https://img.shields.io/npm/v/arkturian-typescript-utils.svg)](https://www.npmjs.com/package/arkturian-typescript-utils)
 
 ---
 
@@ -15,7 +15,7 @@ Built for production use in 3D engines, data visualization, and interactive appl
 Every property change animates automatically. No manual tweening, no animation loops.
 
 ```typescript
-import { InterpolatedProperty, Vector3 } from '@apopovic77/typescript-utils';
+import { InterpolatedProperty, Vector3 } from 'arkturian-typescript-utils';
 
 // Create animated property
 const opacity = new InterpolatedProperty('opacity', 1.0, null, 0.3);
@@ -42,7 +42,7 @@ position.value = new Vector3(10, 5, 0); // Smooth movement!
 Complete 2D/3D vector and quaternion library:
 
 ```typescript
-import { Vector3, Quaternion, Color } from '@apopovic77/typescript-utils';
+import { Vector3, Quaternion, Color } from 'arkturian-typescript-utils';
 
 const v1 = new Vector3(1, 2, 3);
 const v2 = new Vector3(4, 5, 6);
@@ -65,7 +65,7 @@ quat.setFromAxisAngle(new Vector3(0, 1, 0), Math.PI / 2); // 90° around Y-axis
 Professional easing functions for smooth animations:
 
 ```typescript
-import { Easing } from '@apopovic77/typescript-utils';
+import { Easing } from 'arkturian-typescript-utils';
 
 // Available easings:
 Easing.linear
@@ -83,7 +83,7 @@ Easing.bounceOut       // Realistic bounce
 Extensible interpolation system:
 
 ```typescript
-import { Lerpable, Slerpable } from '@apopovic77/typescript-utils';
+import { Lerpable, Slerpable } from 'arkturian-typescript-utils';
 
 // Make any type interpolatable
 class MyType implements Lerpable<MyType> {
@@ -108,7 +108,7 @@ prop.value = new MyType(100); // Smooth interpolation!
 ## 📦 Installation
 
 ```bash
-npm install @apopovic77/typescript-utils
+npm install arkturian-typescript-utils
 ```
 
 ### From Source (Development)
@@ -123,7 +123,7 @@ npm link
 
 Then in your project:
 ```bash
-npm link @apopovic77/typescript-utils
+npm link arkturian-typescript-utils
 ```
 
 ---
@@ -137,7 +137,7 @@ import {
     InterpolatedProperty,
     Vector3,
     Easing
-} from '@apopovic77/typescript-utils';
+} from 'arkturian-typescript-utils';
 
 // Create entity with animated properties
 class Entity {
