@@ -98,14 +98,18 @@ export class InterpolatedProperty extends SettingsProperty {
         }
     }
     setImmediate(value) {
-        const wasChanged = !this.isEqual(value, this.value);
+        const oldValue = this.value;
+        const wasChanged = !this.isEqual(value, oldValue);
+        // ALWAYS stop any running animation and set value immediately
+        // This is critical for physics systems where position must be enforced
+        // even if the target value hasn't changed (e.g., RIGID constraints)
+        this._targetValue = value;
+        if (value !== null) {
+            this._startValue = value;
+        }
+        this._animationStartTime = 0; // ALWAYS stop animation
+        // Only fire change event if value actually changed
         if (wasChanged) {
-            const oldValue = this.value;
-            this._targetValue = value;
-            if (value !== null) {
-                this._startValue = value;
-            }
-            this._animationStartTime = 0;
             this.fireChangeEvent(value, oldValue);
         }
     }
