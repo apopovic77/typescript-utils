@@ -54,6 +54,6 @@
     "LICENSE"
   ],
   "dependencies": {
-    "@arkturian/typescript-utils": "^1.3.0"
+    "@arkturian/typescript-utils": "^1.3.1"
   }
 }
