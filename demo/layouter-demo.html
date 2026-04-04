@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Arkturian Layouter Demo (TypeScript Port)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, sans-serif; background: #0f172a; color: white; overflow: hidden; }
+        #container { width: 100vw; height: 100vh; }
+        .toolbar { position: fixed; top: 10px; left: 10px; z-index: 100; display: flex; gap: 6px; flex-wrap: wrap; max-width: 90vw; }
+        .toolbar button {
+            padding: 6px 12px; border-radius: 8px; border: 1px solid #334155;
+            background: rgba(15,23,42,0.9); color: #94a3b8; font-size: 11px; cursor: pointer;
+            backdrop-filter: blur(8px); transition: all 0.15s;
+        }
+        .toolbar button.active { background: #4f46e5; color: white; border-color: #6366f1; }
+        .toolbar button:hover { border-color: #6366f1; color: white; }
+        .controls {
+            position: fixed; top: 10px; right: 10px; z-index: 100;
+            background: rgba(15,23,42,0.92); backdrop-filter: blur(12px);
+            border: 1px solid #334155; border-radius: 12px; padding: 12px; width: 240px;
+            max-height: 90vh; overflow-y: auto; font-size: 12px;
+        }
+        .controls label { display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px; color: #94a3b8; }
+        .controls label span { font-weight: 600; color: #e2e8f0; }
+        .controls input[type="range"] { width: 100%; accent-color: #6366f1; }
+        .controls select { width: 100%; padding: 4px; background: #1e293b; color: white; border: 1px solid #475569; border-radius: 4px; }
+        .controls .val { color: #818cf8; font-family: monospace; float: right; }
+        .info { position: fixed; bottom: 10px; left: 10px; z-index: 100; color: #64748b; font-size: 11px; }
+    </style>
+</head>
+<body>
+    <div class="toolbar" id="toolbar"></div>
+    <div class="controls">
+        <label><span>Count</span><input type="range" id="count" min="3" max="200" value="24"><span class="val" id="countVal">24</span></label>
+        <label><span>Spacing</span><input type="range" id="spacing" min="0" max="5" step="0.1" value="1.5"><span class="val" id="spacingVal">1.5</span></label>
+        <label><span>Spacing Mode</span><select id="spacingMode"><option value="margin">Margin (Fixed)</option><option value="distribute">Distribute</option></select></label>
+        <label><span>Orientation</span><select id="orientation"><option value="aligned">Aligned</option><option value="perpendicular">Perpendicular</option></select></label>
+        <label><span>Up Mode</span><select id="upMode"><option value="world">World Up</option><option value="path">Path Up</option></select></label>
+        <label><span>Size Variation</span><select id="sizeVar"><option value="uniform">Uniform</option><option value="random">Random</option><option value="gradient">Gradient</option></select></label>
+        <label><span>Radius</span><input type="range" id="radius" min="1" max="15" step="0.5" value="5"><span class="val" id="radiusVal">5</span></label>
+        <label><span>Spiral Turns</span><input type="range" id="turns" min="1" max="8" step="0.5" value="2"><span class="val" id="turnsVal">2</span></label>
+        <label><span>Flip 180</span><input type="checkbox" id="flip180"></label>
+    </div>
+    <div class="info" id="info">Arkturian Layouter — TypeScript Port</div>
+    <div id="container"></div>
+
+    <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Import the built layouter library
+        const { Layouters } = await import('../dist/layout/Layouters.js');
+
+        const layoutTypes = [
+            'line', 'circle', 'spiral',
+            'lineAdaptive', 'circleAdaptive', 'spiralAdaptive',
+            'sphereGrid', 'sphereHex', 'sphereHexRings', 'sphereHexHoneycomb',
+            'planeGrid', 'planeHex', 'cylinderGrid',
+        ];
+
+        // Build toolbar buttons
+        const toolbar = document.getElementById('toolbar');
+        let activeLayout = 'line';
+        layoutTypes.forEach(type => {
+            const btn = document.createElement('button');
+            btn.textContent = type;
+            btn.className = type === activeLayout ? 'active' : '';
+            btn.onclick = () => {
+                activeLayout = type;
+                toolbar.querySelectorAll('button').forEach(b => b.className = '');
+                btn.className = 'active';
+                update();
+            };
+            toolbar.appendChild(btn);
+        });
+
+        // Three.js setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0f172a);
+        const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 500);
+        camera.position.set(8, 5, 8);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+        renderer.setSize(innerWidth, innerHeight);
+        document.getElementById('container').appendChild(renderer.domElement);
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        scene.add(new THREE.AmbientLight(0x404040, 0.8));
+        scene.add(new THREE.DirectionalLight(0xffffff, 1.0).translateZ(5).translateY(8));
+        scene.add(new THREE.AxesHelper(2));
+
+        let objects = [];
+
+        function createObjects(count) {
+            objects.forEach(o => scene.remove(o));
+            objects = [];
+            const sizeVar = document.getElementById('sizeVar').value;
+            for (let i = 0; i < count; i++) {
+                let w = 0.3, h = 0.5, d = 0.08;
+                if (sizeVar === 'random') { w *= 0.5 + Math.random(); h *= 0.6 + Math.random() * 0.8; }
+                else if (sizeVar === 'gradient') { const p = i / (count - 1); w *= 0.4 + p * 1.2; h *= 1.4 - p * 0.8; }
+                const geo = new THREE.BoxGeometry(w, h, d);
+                const hue = i / count;
+                const mat = new THREE.MeshLambertMaterial({ color: new THREE.Color().setHSL(hue, 0.75, 0.55) });
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.userData = { naturalWidth: w, naturalHeight: h, width: w, height: h, aspectRatio: w / h };
+                // Front indicator
+                const front = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.03), new THREE.MeshLambertMaterial({ color: 0xff4444 }));
+                front.position.z = d / 2 + 0.015;
+                mesh.add(front);
+                scene.add(mesh);
+                objects.push(mesh);
+            }
+        }
+
+        function update() {
+            const count = +document.getElementById('count').value;
+            if (objects.length !== count || document.getElementById('sizeVar')._changed) {
+                createObjects(count);
+                document.getElementById('sizeVar')._changed = false;
+            }
+
+            const config = {
+                objectCount: count,
+                spacingMode: document.getElementById('spacingMode').value,
+                spacing: +document.getElementById('spacing').value,
+                orientation: document.getElementById('orientation').value,
+                upMode: document.getElementById('upMode').value,
+                flip180: document.getElementById('flip180').checked,
+                radius: +document.getElementById('radius').value,
+                objects: objects,
+                spiralConfig: {
+                    spiralTurns: +document.getElementById('turns').value,
+                    maxRadius: +document.getElementById('radius').value * 0.6,
+                    growthRate: 2.0,
+                    startDistance: 0,
+                },
+            };
+
+            try {
+                const fn = Layouters[activeLayout];
+                if (!fn) { console.warn('No layouter:', activeLayout); return; }
+                const transforms = fn(config);
+                for (let i = 0; i < Math.min(objects.length, transforms.length); i++) {
+                    const t = transforms[i];
+                    objects[i].position.set(t.position.x, t.position.y, t.position.z);
+                    objects[i].rotation.set(t.rotation.x, t.rotation.y, t.rotation.z);
+                    if (t.needsAdaptiveScaling) {
+                        const s = 0.5 / (objects[i].userData.naturalHeight || 0.5);
+                        objects[i].scale.setScalar(s);
+                    } else {
+                        objects[i].scale.set(t.scale.x, t.scale.y, t.scale.z);
+                    }
+                }
+                document.getElementById('info').textContent = `${activeLayout} — ${transforms.length} objects`;
+            } catch (e) {
+                console.error(e);
+                document.getElementById('info').textContent = `Error: ${e.message}`;
+            }
+        }
+
+        // Wire up controls
+        document.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('input', () => {
+                const valEl = document.getElementById(el.id + 'Val');
+                if (valEl) valEl.textContent = el.value;
+                if (el.id === 'sizeVar') el._changed = true;
+                update();
+            });
+        });
+
+        createObjects(24);
+        update();
+
+        (function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        })();
+
+        addEventListener('resize', () => {
+            camera.aspect = innerWidth / innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(innerWidth, innerHeight);
+        });
+    </script>
+</body>
+</html>
