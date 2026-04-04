@@ -14,3 +14,4 @@ export * from './types/type-guards';
 export * from './types/UUID';
 export * from './core/Logger';
 export * from './core/Profiler';
+export * from './layout';

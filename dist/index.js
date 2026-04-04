@@ -17,3 +17,5 @@ export * from './types/UUID';
 // Core
 export * from './core/Logger';
 export * from './core/Profiler';
+// Layout
+export * from './layout';
