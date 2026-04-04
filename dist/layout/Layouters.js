@@ -501,8 +501,9 @@ export class Layouters {
                 }
                 else {
                     const totalWidths = finalWidths.reduce((sum, w) => sum + w, 0);
-                    const availableSpace = lineLength - totalWidths;
-                    const gap = availableSpace / Math.max(1, objectCount - 1);
+                    const effectiveLength = Math.max(lineLength, totalWidths * 1.1);
+                    const availableSpace = effectiveLength - totalWidths;
+                    const gap = Math.max(0, availableSpace / Math.max(1, objectCount - 1));
                     spacingDistance = currentWidth / 2 + gap + nextWidth / 2;
                 }
                 currentPositionAlongLine += spacingDistance;
@@ -548,8 +549,9 @@ export class Layouters {
                 }
                 else {
                     const totalWidths = finalWidths.reduce((sum, w) => sum + w, 0);
-                    const availableSpace = lineLength - totalWidths;
-                    const gap = availableSpace / Math.max(1, objectCount - 1);
+                    const effectiveLength = Math.max(lineLength, totalWidths * 1.1);
+                    const availableSpace = effectiveLength - totalWidths;
+                    const gap = Math.max(0, availableSpace / Math.max(1, objectCount - 1));
                     spacingDistance = currentWidth / 2 + gap + nextWidth / 2;
                 }
                 currentPositionAlongLine += spacingDistance;
