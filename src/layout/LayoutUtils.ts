@@ -263,7 +263,7 @@ export class LayoutUtils {
             lineDirection = null, spiralAxis = null
         } = config;
 
-        const position = positions[objectIndex];
+        const position = positions[objectIndex] ?? { x: 0, y: 0, z: 0 };
 
         const t = LayoutUtils.calculateTParameter(pathType, spacingMode, spacing, objectIndex, objectCount, time);
 

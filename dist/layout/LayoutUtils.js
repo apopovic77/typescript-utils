@@ -181,7 +181,7 @@ export class LayoutUtils {
      */
     static calculateCompleteTransform(config) {
         const { pathType, spacingMode, spacing, objectIndex, objectCount, time, sphereU, sphereV, planeX, planeZ, orientation, upMode, positions, flip180 = false, spiralConfig = null, lineDirection = null, spiralAxis = null } = config;
-        const position = positions[objectIndex];
+        const position = positions[objectIndex] ?? { x: 0, y: 0, z: 0 };
         const t = LayoutUtils.calculateTParameter(pathType, spacingMode, spacing, objectIndex, objectCount, time);
         const { tangent, normal, binormal } = LayoutUtils.getSurfaceVectors(pathType, position, t, sphereU, sphereV, planeX, planeZ, spiralConfig, lineDirection, spiralAxis);
         const rotation = LayoutUtils.calculateOrientation(tangent, normal, binormal, position, orientation, upMode, pathType, flip180);
