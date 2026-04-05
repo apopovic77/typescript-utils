@@ -1,6 +1,6 @@
 {
   "name": "@arkturian/typescript-utils",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "TypeScript utilities including InterpolatedProperty, Vector math, Quaternions, and Easing functions",
   "type": "module",
   "main": "dist/index.js",

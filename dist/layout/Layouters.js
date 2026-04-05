@@ -484,11 +484,10 @@ export class Layouters {
             finalWidths.push(finalWidth);
         }
         // 4. ITERATIVE positioning — masonry-style: each tile placed edge-to-edge + gap
-        // Both spacing modes use the same iterative approach.
-        // 'margin': spacing = fixed gap between tiles
-        // 'distribute': spacing = gap, total length adapts to content
+        // 'margin': spacing = fixed gap between tiles (0 = seamless)
+        // 'distribute': always seamless (gap = 0), tiles fill edge-to-edge
         const adaptiveTransforms = [];
-        const gap = spacing;
+        const gap = spacingMode === 'distribute' ? 0 : spacing;
         // First pass: compute total length for centering
         let totalLength = 0;
         for (let i = 0; i < finalWidths.length; i++) {
