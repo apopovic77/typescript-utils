@@ -692,35 +692,34 @@ export class Layouters {
             finalWidths.push(finalWidth);
         }
 
-        // 4. ITERATIVE positioning
+        // 4. ITERATIVE positioning — masonry-style: each tile placed edge-to-edge + gap
+        // Both spacing modes use the same iterative approach.
+        // 'margin': spacing = fixed gap between tiles
+        // 'distribute': spacing = gap, total length adapts to content
         const adaptiveTransforms: LayoutTransform[] = [];
-        let currentPositionAlongLine = 0;
+        const gap = spacing;
+
+        // First pass: compute total length for centering
+        let totalLength = 0;
+        for (let i = 0; i < finalWidths.length; i++) {
+            totalLength += finalWidths[i];
+            if (i < finalWidths.length - 1) totalLength += gap;
+        }
+
+        // Second pass: place tiles centered around origin
+        let cursor = -totalLength / 2;
 
         for (let i = 0; i < objectCount && objects && i < objects.length && i < baseTransforms.length; i++) {
             const currentWidth = finalWidths[i];
+            const centerPos = cursor + currentWidth / 2;
 
             const newPosition: Vec3 = {
-                x: startPos.x + unitDirection.x * currentPositionAlongLine,
-                y: startPos.y + unitDirection.y * currentPositionAlongLine,
-                z: startPos.z + unitDirection.z * currentPositionAlongLine
+                x: startPos.x + unitDirection.x * centerPos,
+                y: startPos.y + unitDirection.y * centerPos,
+                z: startPos.z + unitDirection.z * centerPos
             };
 
-            if (i < objectCount - 1) {
-                const nextWidth = finalWidths[i + 1];
-                let spacingDistance: number;
-
-                if (spacingMode === 'margin') {
-                    spacingDistance = currentWidth / 2 + spacing + nextWidth / 2;
-                } else {
-                    const totalWidths = finalWidths.reduce((sum, w) => sum + w, 0);
-                    const effectiveLength = Math.max(lineLength, totalWidths * 1.1);
-                    const availableSpace = effectiveLength - totalWidths;
-                    const gap = Math.max(0, availableSpace / Math.max(1, objectCount - 1));
-                    spacingDistance = currentWidth / 2 + gap + nextWidth / 2;
-                }
-
-                currentPositionAlongLine += spacingDistance;
-            }
+            cursor += currentWidth + gap;
 
             adaptiveTransforms.push({
                 position: newPosition,
@@ -761,33 +760,28 @@ export class Layouters {
         }
 
         const adaptiveTransforms: LayoutTransform[] = [];
-        let currentPositionAlongLine = 0;
+        const gap = spacing;
+
+        // Compute total length for centering
+        let totalLength = 0;
+        for (let i = 0; i < finalWidths.length; i++) {
+            totalLength += finalWidths[i];
+            if (i < finalWidths.length - 1) totalLength += gap;
+        }
+
+        let cursor = -totalLength / 2;
 
         for (let i = 0; i < objectCount && objects && i < objects.length; i++) {
             const currentWidth = finalWidths[i];
+            const centerPos = cursor + currentWidth / 2;
 
             const newPosition: Vec3 = {
-                x: startPos.x + unitDirection.x * currentPositionAlongLine,
-                y: startPos.y + unitDirection.y * currentPositionAlongLine,
-                z: startPos.z + unitDirection.z * currentPositionAlongLine
+                x: startPos.x + unitDirection.x * centerPos,
+                y: startPos.y + unitDirection.y * centerPos,
+                z: startPos.z + unitDirection.z * centerPos
             };
 
-            if (i < objectCount - 1) {
-                const nextWidth = finalWidths[i + 1];
-                let spacingDistance: number;
-
-                if (spacingMode === 'margin') {
-                    spacingDistance = currentWidth / 2 + spacing + nextWidth / 2;
-                } else {
-                    const totalWidths = finalWidths.reduce((sum, w) => sum + w, 0);
-                    const effectiveLength = Math.max(lineLength, totalWidths * 1.1);
-                    const availableSpace = effectiveLength - totalWidths;
-                    const gap = Math.max(0, availableSpace / Math.max(1, objectCount - 1));
-                    spacingDistance = currentWidth / 2 + gap + nextWidth / 2;
-                }
-
-                currentPositionAlongLine += spacingDistance;
-            }
+            cursor += currentWidth + gap;
 
             // Calculate proper rotation using LayoutUtils
             const transform = LayoutUtils.calculateCompleteTransform({
