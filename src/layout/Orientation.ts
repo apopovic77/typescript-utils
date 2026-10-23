@@ -7,7 +7,7 @@
  * a pure function that returns Euler angles instead of mutating a Three.js Object3D.
  */
 
-import { Vec3, OrientationMode, UpVectorMode, PathType } from './types';
+import { Vec3, OrientationMode, UpVectorMode, PathType, DEFAULT_PLANE_TILT } from './types';
 
 // --- Internal Vec3 math helpers ---
 
@@ -169,7 +169,8 @@ export class Orientation {
         _position: Vec3,
         orientation: OrientationMode,
         upMode: UpVectorMode,
-        pathType: PathType
+        pathType: PathType,
+        planeTilt: number = DEFAULT_PLANE_TILT
     ): Vec3 {
         // Step 1: Determine what the object should point towards
         let desiredForward: Vec3;
@@ -259,7 +260,8 @@ export class Orientation {
 
         // Special case: For plane + aligned + path up, add -90 rotation around yellow arrow axis
         if (pathType.startsWith('plane') && orientation === 'aligned' && upMode === 'path') {
-            const yellowArrowAxis = vec3Normalize(vec3(0, Math.sin(Math.PI / 4), Math.cos(Math.PI / 4)));
+            // plane normal (0, cos t, sin t); for the original fixed 45° slope this is (0, sin 45°, cos 45°)
+            const yellowArrowAxis = vec3Normalize(vec3(0, Math.cos(planeTilt), Math.sin(planeTilt)));
             const rotationMinus90 = quatFromAxisAngle(yellowArrowAxis, -Math.PI / 2);
             let finalQuat = quatMultiply(rotationMinus90, quat);
 

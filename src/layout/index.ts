@@ -34,7 +34,8 @@ export {
     ObjectDimensions,
     LayoutObject,
     LayoutConfig,
-    SurfaceVectors
+    SurfaceVectors,
+    DEFAULT_PLANE_TILT
 } from './types';
 
 // High-level API

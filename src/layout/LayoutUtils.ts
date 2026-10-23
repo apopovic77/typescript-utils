@@ -4,7 +4,7 @@
  * Pure functions, no Three.js dependency.
  */
 
-import { Vec3, PathType, SpacingMode, OrientationMode, UpVectorMode, SpiralConfig, SurfaceVectors, LayoutTransform } from './types';
+import { Vec3, PathType, SpacingMode, OrientationMode, UpVectorMode, SpiralConfig, SurfaceVectors, LayoutTransform, DEFAULT_PLANE_TILT } from './types';
 import { PathLayouts } from './PathLayouts';
 import { Orientation } from './Orientation';
 
@@ -167,7 +167,8 @@ export class LayoutUtils {
         planeZ: number | null,
         spiralConfig: SpiralConfig | null = null,
         lineDirection: Vec3 | null = null,
-        spiralAxis: Vec3 | null = null
+        spiralAxis: Vec3 | null = null,
+        planeTilt: number = DEFAULT_PLANE_TILT
     ): SurfaceVectors {
         const su = sphereU ?? 0.25;
         const sv = sphereV ?? 0.25;
@@ -178,8 +179,8 @@ export class LayoutUtils {
 
         if (pathType.startsWith('sphere') || pathType.startsWith('plane')) {
             tangent = PathLayouts.getTangentAtPosition(position, pathType);
-            normal = PathLayouts.getNormalAtPosition(position, pathType);
-            binormal = PathLayouts.getBinormalAtPosition(position, pathType);
+            normal = PathLayouts.getNormalAtPosition(position, pathType, planeTilt);
+            binormal = PathLayouts.getBinormalAtPosition(position, pathType, planeTilt);
         } else {
             tangent = PathLayouts.getTangent(t, pathType, su, sv, spiralConfig, lineDirection, spiralAxis);
             normal = PathLayouts.getNormal(t, pathType, su, sv, spiralConfig, lineDirection, spiralAxis);
@@ -201,11 +202,12 @@ export class LayoutUtils {
         orientation: OrientationMode,
         upMode: UpVectorMode,
         pathType: PathType,
-        flip180: boolean = false
+        flip180: boolean = false,
+        planeTilt: number = DEFAULT_PLANE_TILT
     ): Vec3 {
         // Get base rotation from the orientation calculator
         const baseEuler = Orientation.calculateOrientationEuler(
-            tangent, normal, binormal, position, orientation, upMode, pathType
+            tangent, normal, binormal, position, orientation, upMode, pathType, planeTilt
         );
 
         // Apply 180 flip if requested
@@ -255,12 +257,13 @@ export class LayoutUtils {
         lineDirection?: Vec3 | null;
         spiralAxis?: Vec3 | null;
         direction?: Vec3 | null;
+        planeTilt?: number;
     }): LayoutTransform {
         const {
             pathType, spacingMode, spacing, objectIndex, objectCount, time,
             sphereU, sphereV, planeX, planeZ, orientation, upMode, positions,
             flip180 = false, spiralConfig = null,
-            lineDirection = null, spiralAxis = null
+            lineDirection = null, spiralAxis = null, planeTilt = DEFAULT_PLANE_TILT
         } = config;
 
         const position = positions[objectIndex] ?? { x: 0, y: 0, z: 0 };
@@ -268,11 +271,11 @@ export class LayoutUtils {
         const t = LayoutUtils.calculateTParameter(pathType, spacingMode, spacing, objectIndex, objectCount, time);
 
         const { tangent, normal, binormal } = LayoutUtils.getSurfaceVectors(
-            pathType, position, t, sphereU, sphereV, planeX, planeZ, spiralConfig, lineDirection, spiralAxis
+            pathType, position, t, sphereU, sphereV, planeX, planeZ, spiralConfig, lineDirection, spiralAxis, planeTilt
         );
 
         const rotation = LayoutUtils.calculateOrientation(
-            tangent, normal, binormal, position, orientation, upMode, pathType, flip180
+            tangent, normal, binormal, position, orientation, upMode, pathType, flip180, planeTilt
         );
 
         return {

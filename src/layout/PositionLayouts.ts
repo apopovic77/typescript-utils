@@ -3,7 +3,7 @@
  * Port of position-layouts.js - all position generation functions.
  */
 
-import { Vec3, PathType, SpacingMode, GridMode, HexMode, SpiralConfig, SpiralAxis } from './types';
+import { Vec3, PathType, SpacingMode, GridMode, HexMode, SpiralConfig, SpiralAxis, DEFAULT_PLANE_TILT } from './types';
 import { PathLayouts } from './PathLayouts';
 
 export class PositionLayouts {
@@ -29,7 +29,8 @@ export class PositionLayouts {
         spiralConfig: SpiralConfig | null = null,
         lineDirection: Vec3 | null = null,
         spiralAxis: Vec3 | SpiralAxis | null = null,
-        radius: number = 2.0
+        radius: number = 2.0,
+        planeTilt: number = DEFAULT_PLANE_TILT
     ): Vec3[] {
         const positions: Vec3[] = [];
 
@@ -86,11 +87,11 @@ export class PositionLayouts {
                 break;
 
             case 'plane_grid':
-                positions.push(...PositionLayouts.getPlaneGridPositions(objectCount, spacing, spacingMode, gridMode, gridRows, gridCols));
+                positions.push(...PositionLayouts.getPlaneGridPositions(objectCount, spacing, spacingMode, gridMode, gridRows, gridCols, planeTilt));
                 break;
 
             case 'plane_hex':
-                positions.push(...PositionLayouts.getPlaneHexPositions(objectCount, spacing, spacingMode, hexMode, hexRings));
+                positions.push(...PositionLayouts.getPlaneHexPositions(objectCount, spacing, spacingMode, hexMode, hexRings, planeTilt));
                 break;
 
             case 'sphere_grid':
@@ -177,7 +178,8 @@ export class PositionLayouts {
         spacingMode: SpacingMode,
         gridMode: GridMode,
         gridRows: number,
-        gridCols: number
+        gridCols: number,
+        planeTilt: number = DEFAULT_PLANE_TILT
     ): Vec3[] {
         const positions: Vec3[] = [];
         let rows: number, cols: number;
@@ -211,7 +213,7 @@ export class PositionLayouts {
             const localX = startX + col * cellSpacingX;
             const localZ = startZ + row * cellSpacingZ;
 
-            const tiltAngle = Math.PI / 4;
+            const tiltAngle = planeTilt;
             positions.push({
                 x: localX,
                 y: -localZ * Math.sin(tiltAngle),
@@ -229,7 +231,8 @@ export class PositionLayouts {
         spacing: number,
         spacingMode: SpacingMode,
         hexMode: HexMode,
-        hexRings: number
+        hexRings: number,
+        planeTilt: number = DEFAULT_PLANE_TILT
     ): Vec3[] {
         const positions: Vec3[] = [];
 
@@ -255,7 +258,7 @@ export class PositionLayouts {
                     const localX = Math.cos(angle) * radius;
                     const localZ = Math.sin(angle) * radius;
 
-                    const tiltAngle = Math.PI / 4;
+                    const tiltAngle = planeTilt;
                     positions.push({
                         x: localX,
                         y: -localZ * Math.sin(tiltAngle),
@@ -286,7 +289,7 @@ export class PositionLayouts {
                 const localX = col * colSpacing + offsetX - (hexRings - 1) * colSpacing / 2;
                 const localZ = row * rowSpacing - (Math.ceil(objectCount / hexRings) - 1) * rowSpacing / 2;
 
-                const tiltAngle = Math.PI / 4;
+                const tiltAngle = planeTilt;
                 positions.push({
                     x: localX,
                     y: -localZ * Math.sin(tiltAngle),
