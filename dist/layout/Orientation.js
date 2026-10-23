@@ -6,6 +6,7 @@
  * Port of orientation.js - applyOrientationToObject converted to
  * a pure function that returns Euler angles instead of mutating a Three.js Object3D.
  */
+import { DEFAULT_PLANE_TILT } from './types';
 // --- Internal Vec3 math helpers ---
 function vec3(x, y, z) {
     return { x, y, z };
@@ -135,7 +136,7 @@ export class Orientation {
      *
      * @returns Vec3 with Euler angles (x, y, z) in radians.
      */
-    static calculateOrientationEuler(tangent, normal, binormal, _position, orientation, upMode, pathType) {
+    static calculateOrientationEuler(tangent, normal, binormal, _position, orientation, upMode, pathType, planeTilt = DEFAULT_PLANE_TILT) {
         // Step 1: Determine what the object should point towards
         let desiredForward;
         if (orientation === 'aligned') {
@@ -225,7 +226,8 @@ export class Orientation {
         let quat = quatFromMatrix(finalRight, finalUp, finalForward);
         // Special case: For plane + aligned + path up, add -90 rotation around yellow arrow axis
         if (pathType.startsWith('plane') && orientation === 'aligned' && upMode === 'path') {
-            const yellowArrowAxis = vec3Normalize(vec3(0, Math.sin(Math.PI / 4), Math.cos(Math.PI / 4)));
+            // plane normal (0, cos t, sin t); for the original fixed 45° slope this is (0, sin 45°, cos 45°)
+            const yellowArrowAxis = vec3Normalize(vec3(0, Math.cos(planeTilt), Math.sin(planeTilt)));
             const rotationMinus90 = quatFromAxisAngle(yellowArrowAxis, -Math.PI / 2);
             let finalQuat = quatMultiply(rotationMinus90, quat);
             // Additional 90 rotation around cyan vector (object's forward axis)

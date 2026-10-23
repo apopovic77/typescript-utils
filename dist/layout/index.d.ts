@@ -18,7 +18,7 @@
  * });
  * ```
  */
-export { SpacingMode, OrientationMode, UpVectorMode, PathType, GridMode, HexMode, SpiralAxis, Vec3, LayoutTransform, SpiralConfig, ObjectDimensions, LayoutObject, LayoutConfig, SurfaceVectors } from './types';
+export { SpacingMode, OrientationMode, UpVectorMode, PathType, GridMode, HexMode, SpiralAxis, Vec3, LayoutTransform, SpiralConfig, ObjectDimensions, LayoutObject, LayoutConfig, SurfaceVectors, DEFAULT_PLANE_TILT } from './types';
 export { Layouters } from './Layouters';
 export { PositionLayouts } from './PositionLayouts';
 export { PathLayouts } from './PathLayouts';

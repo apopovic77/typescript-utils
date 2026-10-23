@@ -27,10 +27,10 @@ export declare class PathLayouts {
     static getSphereUTangent(sphereU: number, sphereV: number): Vec3;
     static getSphereVTangent(sphereU: number, sphereV: number): Vec3;
     static getPlaneXTangent(): Vec3;
-    static getPlaneZTangent(): Vec3;
+    static getPlaneZTangent(planeTilt?: number): Vec3;
     static getCylinderUTangent(): Vec3;
     static getCylinderVTangent(): Vec3;
     static getTangentAtPosition(position: Vec3, pathType: PathType): Vec3;
-    static getNormalAtPosition(position: Vec3, pathType: PathType): Vec3;
-    static getBinormalAtPosition(position: Vec3, pathType: PathType): Vec3;
+    static getNormalAtPosition(position: Vec3, pathType: PathType, planeTilt?: number): Vec3;
+    static getBinormalAtPosition(position: Vec3, pathType: PathType, planeTilt?: number): Vec3;
 }

@@ -12,12 +12,12 @@ export declare class LayoutUtils {
     /**
      * Get surface vectors (tangent, normal, binormal) for given position/parameter.
      */
-    static getSurfaceVectors(pathType: PathType, position: Vec3, t: number, sphereU: number | null, sphereV: number | null, planeX: number | null, planeZ: number | null, spiralConfig?: SpiralConfig | null, lineDirection?: Vec3 | null, spiralAxis?: Vec3 | null): SurfaceVectors;
+    static getSurfaceVectors(pathType: PathType, position: Vec3, t: number, sphereU: number | null, sphereV: number | null, planeX: number | null, planeZ: number | null, spiralConfig?: SpiralConfig | null, lineDirection?: Vec3 | null, spiralAxis?: Vec3 | null, planeTilt?: number): SurfaceVectors;
     /**
      * Calculate orientation (rotation) for object - Pure function.
      * Returns Euler angles in radians.
      */
-    static calculateOrientation(tangent: Vec3, normal: Vec3, binormal: Vec3, position: Vec3, orientation: OrientationMode, upMode: UpVectorMode, pathType: PathType, flip180?: boolean): Vec3;
+    static calculateOrientation(tangent: Vec3, normal: Vec3, binormal: Vec3, position: Vec3, orientation: OrientationMode, upMode: UpVectorMode, pathType: PathType, flip180?: boolean, planeTilt?: number): Vec3;
     /**
      * Calculate complete transform (position + rotation + scale) for single object.
      */
@@ -40,5 +40,6 @@ export declare class LayoutUtils {
         lineDirection?: Vec3 | null;
         spiralAxis?: Vec3 | null;
         direction?: Vec3 | null;
+        planeTilt?: number;
     }): LayoutTransform;
 }

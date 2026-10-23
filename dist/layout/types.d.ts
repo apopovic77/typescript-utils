@@ -2,6 +2,8 @@
  * Layout System Types
  * All interfaces and enums for the ModernLayouters system.
  */
+/** Tilt of plane layouts around x when none is given: the original 45° slope (radians). */
+export declare const DEFAULT_PLANE_TILT: number;
 /** How objects are spaced along a path or surface. */
 export type SpacingMode = 'margin' | 'distribute';
 /** How objects are oriented relative to their path/surface. */
@@ -66,6 +68,11 @@ export interface LayoutConfig {
     gridRows?: number;
     gridCols?: number;
     hexMode?: HexMode;
+    /**
+     * Tilt of plane layouts (plane_grid, plane_hex, plane_hex_rings) around x, in radians.
+     * 0 = flat on the ground (xz), PI/2 = upright wall (xy). Default PI/4 (the original 45° slope).
+     */
+    planeTilt?: number;
     params?: Record<string, unknown>;
 }
 /** Surface vectors (tangent, normal, binormal) for orientation calculations. */

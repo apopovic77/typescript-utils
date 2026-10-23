@@ -3,6 +3,7 @@
  * Port of modern-layouters.js ModernLayouters class.
  * Each static method takes a LayoutConfig and returns LayoutTransform[].
  */
+import { DEFAULT_PLANE_TILT } from './types';
 import { PositionLayouts } from './PositionLayouts';
 import { LayoutUtils } from './LayoutUtils';
 // --- Internal Vec3 math helpers ---
@@ -21,6 +22,20 @@ function vec3Cross(a, b) {
         y: a.z * b.x - a.x * b.z,
         z: a.x * b.y - a.y * b.x
     };
+}
+/**
+ * Grid rows/cols from the config: explicit gridMode wins; rows or cols given without a mode means
+ * 'manual', the missing one follows from the count. Default 'auto' (square-ish).
+ */
+function gridOptions(config) {
+    const n = Math.max(1, config.objectCount);
+    const rows = config.gridRows, cols = config.gridCols;
+    const mode = config.gridMode ?? (rows || cols ? 'manual' : 'auto');
+    if (mode === 'auto')
+        return { gridMode: 'auto', gridRows: 3, gridCols: 3 };
+    const r = rows ?? Math.ceil(n / (cols ?? Math.ceil(Math.sqrt(n))));
+    const c = cols ?? Math.ceil(n / r);
+    return { gridMode: 'manual', gridRows: Math.max(1, r), gridCols: Math.max(1, c) };
 }
 export class Layouters {
     // ======================================================================
@@ -294,7 +309,9 @@ export class Layouters {
      */
     static planeGrid(config) {
         const { objectCount, spacingMode = 'distribute', spacing = 1.5, orientation = 'aligned', upMode = 'world', flip180 = false } = config;
-        const positions = PositionLayouts.getLayoutPositions('plane_grid', objectCount, spacing, spacingMode, 0, 0.25, 0.25, 0.5, 0.5, 'auto', 3, 3, 'radial', 2);
+        const { gridMode, gridRows, gridCols } = gridOptions(config);
+        const planeTilt = config.planeTilt ?? DEFAULT_PLANE_TILT;
+        const positions = PositionLayouts.getLayoutPositions('plane_grid', objectCount, spacing, spacingMode, 0, 0.25, 0.25, 0.5, 0.5, gridMode, gridRows, gridCols, 'radial', 2, null, null, null, 2.0, planeTilt);
         if (!positions || positions.length === 0) {
             throw new Error(`No positions generated for plane_grid with ${objectCount} objects`);
         }
@@ -314,7 +331,8 @@ export class Layouters {
                 orientation,
                 upMode,
                 flip180,
-                positions
+                positions,
+                planeTilt
             });
             transforms.push(transform);
         }
@@ -325,7 +343,8 @@ export class Layouters {
      */
     static planeHex(config) {
         const { objectCount, spacingMode = 'distribute', spacing = 1.5, orientation = 'aligned', upMode = 'world', flip180 = false } = config;
-        const positions = PositionLayouts.getLayoutPositions('plane_hex', objectCount, spacing, spacingMode, 0, 0.25, 0.25, 0.5, 0.5, 'auto', 3, 3, 'radial', 2);
+        const planeTilt = config.planeTilt ?? DEFAULT_PLANE_TILT;
+        const positions = PositionLayouts.getLayoutPositions('plane_hex', objectCount, spacing, spacingMode, 0, 0.25, 0.25, 0.5, 0.5, 'auto', 3, 3, config.hexMode ?? 'radial', config.hexRings ?? 2, null, null, null, 2.0, planeTilt);
         if (!positions || positions.length === 0) {
             throw new Error(`No positions generated for plane_hex with ${objectCount} objects`);
         }
@@ -345,7 +364,8 @@ export class Layouters {
                 orientation,
                 upMode,
                 flip180,
-                positions
+                positions,
+                planeTilt
             });
             transforms.push(transform);
         }
@@ -356,7 +376,8 @@ export class Layouters {
      */
     static planeHexRings(config) {
         const { objectCount, spacingMode = 'distribute', spacing = 1.5, orientation = 'aligned', upMode = 'world', flip180 = false } = config;
-        const positions = PositionLayouts.getPlaneHexPositions(objectCount, spacing, spacingMode, 'radial', 10);
+        const planeTilt = config.planeTilt ?? DEFAULT_PLANE_TILT;
+        const positions = PositionLayouts.getPlaneHexPositions(objectCount, spacing, spacingMode, config.hexMode ?? 'radial', config.hexRings ?? 10, planeTilt);
         if (!positions || positions.length === 0) {
             throw new Error(`No positions generated for plane_hex_rings with ${objectCount} objects`);
         }
@@ -376,7 +397,8 @@ export class Layouters {
                 orientation,
                 upMode,
                 flip180,
-                positions
+                positions,
+                planeTilt
             });
             transforms.push(transform);
         }
