@@ -3,6 +3,7 @@
  * Computes path points, tangents, normals, and binormals for all path types.
  * All functions are pure and Three.js-independent.
  */
+import { DEFAULT_PLANE_TILT } from './types';
 // --- Internal Vec3 math helpers ---
 function vec3(x, y, z) {
     return { x, y, z };
@@ -463,8 +464,8 @@ export class PathLayouts {
     static getPlaneXTangent() {
         return { x: 1, y: 0, z: 0 };
     }
-    static getPlaneZTangent() {
-        const tiltAngle = Math.PI / 4;
+    static getPlaneZTangent(planeTilt = DEFAULT_PLANE_TILT) {
+        const tiltAngle = planeTilt;
         return vec3Normalize({
             x: 0,
             y: -Math.sin(tiltAngle),
@@ -500,7 +501,7 @@ export class PathLayouts {
         }
         return { x: 1, y: 0, z: 0 };
     }
-    static getNormalAtPosition(position, pathType) {
+    static getNormalAtPosition(position, pathType, planeTilt = DEFAULT_PLANE_TILT) {
         if (pathType.startsWith('sphere')) {
             const radius = 2;
             const phi = Math.atan2(position.z, position.x);
@@ -512,17 +513,17 @@ export class PathLayouts {
             });
         }
         else if (pathType.startsWith('plane')) {
-            return PathLayouts.getPlaneZTangent();
+            return PathLayouts.getPlaneZTangent(planeTilt);
         }
         return { x: 0, y: 1, z: 0 };
     }
-    static getBinormalAtPosition(position, pathType) {
+    static getBinormalAtPosition(position, pathType, planeTilt = DEFAULT_PLANE_TILT) {
         if (pathType.startsWith('sphere')) {
             return vec3Normalize(position);
         }
         else if (pathType.startsWith('plane')) {
             const xTangent = PathLayouts.getPlaneXTangent();
-            const zTangent = PathLayouts.getPlaneZTangent();
+            const zTangent = PathLayouts.getPlaneZTangent(planeTilt);
             return vec3Normalize(vec3Cross(xTangent, zTangent));
         }
         return { x: 0, y: 0, z: 1 };

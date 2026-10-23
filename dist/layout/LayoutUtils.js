@@ -3,6 +3,7 @@
  * Computes complete transforms (position + rotation + scale) for objects.
  * Pure functions, no Three.js dependency.
  */
+import { DEFAULT_PLANE_TILT } from './types';
 import { PathLayouts } from './PathLayouts';
 import { Orientation } from './Orientation';
 // --- Internal Vec3 math helpers ---
@@ -127,7 +128,7 @@ export class LayoutUtils {
     /**
      * Get surface vectors (tangent, normal, binormal) for given position/parameter.
      */
-    static getSurfaceVectors(pathType, position, t, sphereU, sphereV, planeX, planeZ, spiralConfig = null, lineDirection = null, spiralAxis = null) {
+    static getSurfaceVectors(pathType, position, t, sphereU, sphereV, planeX, planeZ, spiralConfig = null, lineDirection = null, spiralAxis = null, planeTilt = DEFAULT_PLANE_TILT) {
         const su = sphereU ?? 0.25;
         const sv = sphereV ?? 0.25;
         const px = planeX ?? 0.5;
@@ -135,8 +136,8 @@ export class LayoutUtils {
         let tangent, normal, binormal;
         if (pathType.startsWith('sphere') || pathType.startsWith('plane')) {
             tangent = PathLayouts.getTangentAtPosition(position, pathType);
-            normal = PathLayouts.getNormalAtPosition(position, pathType);
-            binormal = PathLayouts.getBinormalAtPosition(position, pathType);
+            normal = PathLayouts.getNormalAtPosition(position, pathType, planeTilt);
+            binormal = PathLayouts.getBinormalAtPosition(position, pathType, planeTilt);
         }
         else {
             tangent = PathLayouts.getTangent(t, pathType, su, sv, spiralConfig, lineDirection, spiralAxis);
@@ -149,9 +150,9 @@ export class LayoutUtils {
      * Calculate orientation (rotation) for object - Pure function.
      * Returns Euler angles in radians.
      */
-    static calculateOrientation(tangent, normal, binormal, position, orientation, upMode, pathType, flip180 = false) {
+    static calculateOrientation(tangent, normal, binormal, position, orientation, upMode, pathType, flip180 = false, planeTilt = DEFAULT_PLANE_TILT) {
         // Get base rotation from the orientation calculator
-        const baseEuler = Orientation.calculateOrientationEuler(tangent, normal, binormal, position, orientation, upMode, pathType);
+        const baseEuler = Orientation.calculateOrientationEuler(tangent, normal, binormal, position, orientation, upMode, pathType, planeTilt);
         // Apply 180 flip if requested
         if (flip180) {
             let localUpAxis;
@@ -180,11 +181,11 @@ export class LayoutUtils {
      * Calculate complete transform (position + rotation + scale) for single object.
      */
     static calculateCompleteTransform(config) {
-        const { pathType, spacingMode, spacing, objectIndex, objectCount, time, sphereU, sphereV, planeX, planeZ, orientation, upMode, positions, flip180 = false, spiralConfig = null, lineDirection = null, spiralAxis = null } = config;
+        const { pathType, spacingMode, spacing, objectIndex, objectCount, time, sphereU, sphereV, planeX, planeZ, orientation, upMode, positions, flip180 = false, spiralConfig = null, lineDirection = null, spiralAxis = null, planeTilt = DEFAULT_PLANE_TILT } = config;
         const position = positions[objectIndex] ?? { x: 0, y: 0, z: 0 };
         const t = LayoutUtils.calculateTParameter(pathType, spacingMode, spacing, objectIndex, objectCount, time);
-        const { tangent, normal, binormal } = LayoutUtils.getSurfaceVectors(pathType, position, t, sphereU, sphereV, planeX, planeZ, spiralConfig, lineDirection, spiralAxis);
-        const rotation = LayoutUtils.calculateOrientation(tangent, normal, binormal, position, orientation, upMode, pathType, flip180);
+        const { tangent, normal, binormal } = LayoutUtils.getSurfaceVectors(pathType, position, t, sphereU, sphereV, planeX, planeZ, spiralConfig, lineDirection, spiralAxis, planeTilt);
+        const rotation = LayoutUtils.calculateOrientation(tangent, normal, binormal, position, orientation, upMode, pathType, flip180, planeTilt);
         return {
             position: { x: position.x, y: position.y, z: position.z },
             rotation: { x: rotation.x, y: rotation.y, z: rotation.z },

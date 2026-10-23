@@ -2,12 +2,13 @@
  * PositionLayouts - Position calculation for all layout types.
  * Port of position-layouts.js - all position generation functions.
  */
+import { DEFAULT_PLANE_TILT } from './types';
 import { PathLayouts } from './PathLayouts';
 export class PositionLayouts {
     /**
      * Main entry point: get layout positions for any path type.
      */
-    static getLayoutPositions(pathType, objectCount, spacing, spacingMode, time, sphereU, sphereV, planeX, planeZ, gridMode, gridRows, gridCols, hexMode, hexRings, spiralConfig = null, lineDirection = null, spiralAxis = null, radius = 2.0) {
+    static getLayoutPositions(pathType, objectCount, spacing, spacingMode, time, sphereU, sphereV, planeX, planeZ, gridMode, gridRows, gridCols, hexMode, hexRings, spiralConfig = null, lineDirection = null, spiralAxis = null, radius = 2.0, planeTilt = DEFAULT_PLANE_TILT) {
         const positions = [];
         switch (pathType) {
             case 'line':
@@ -57,10 +58,10 @@ export class PositionLayouts {
                 }
                 break;
             case 'plane_grid':
-                positions.push(...PositionLayouts.getPlaneGridPositions(objectCount, spacing, spacingMode, gridMode, gridRows, gridCols));
+                positions.push(...PositionLayouts.getPlaneGridPositions(objectCount, spacing, spacingMode, gridMode, gridRows, gridCols, planeTilt));
                 break;
             case 'plane_hex':
-                positions.push(...PositionLayouts.getPlaneHexPositions(objectCount, spacing, spacingMode, hexMode, hexRings));
+                positions.push(...PositionLayouts.getPlaneHexPositions(objectCount, spacing, spacingMode, hexMode, hexRings, planeTilt));
                 break;
             case 'sphere_grid':
                 positions.push(...PositionLayouts.getSphereGridPositions(objectCount, spacing, spacingMode, radius));
@@ -118,7 +119,7 @@ export class PositionLayouts {
         };
     }
     // --- Plane Grid ---
-    static getPlaneGridPositions(objectCount, spacing, spacingMode, gridMode, gridRows, gridCols) {
+    static getPlaneGridPositions(objectCount, spacing, spacingMode, gridMode, gridRows, gridCols, planeTilt = DEFAULT_PLANE_TILT) {
         const positions = [];
         let rows, cols;
         if (gridMode === 'auto') {
@@ -146,7 +147,7 @@ export class PositionLayouts {
             const col = i % cols;
             const localX = startX + col * cellSpacingX;
             const localZ = startZ + row * cellSpacingZ;
-            const tiltAngle = Math.PI / 4;
+            const tiltAngle = planeTilt;
             positions.push({
                 x: localX,
                 y: -localZ * Math.sin(tiltAngle),
@@ -156,7 +157,7 @@ export class PositionLayouts {
         return positions;
     }
     // --- Plane Hex ---
-    static getPlaneHexPositions(objectCount, spacing, spacingMode, hexMode, hexRings) {
+    static getPlaneHexPositions(objectCount, spacing, spacingMode, hexMode, hexRings, planeTilt = DEFAULT_PLANE_TILT) {
         const positions = [];
         if (hexMode === 'radial') {
             if (objectCount > 0) {
@@ -177,7 +178,7 @@ export class PositionLayouts {
                     const angle = (i / objectsInRing) * Math.PI * 2;
                     const localX = Math.cos(angle) * radius;
                     const localZ = Math.sin(angle) * radius;
-                    const tiltAngle = Math.PI / 4;
+                    const tiltAngle = planeTilt;
                     positions.push({
                         x: localX,
                         y: -localZ * Math.sin(tiltAngle),
@@ -206,7 +207,7 @@ export class PositionLayouts {
                 const offsetX = (row % 2) * colSpacing / 2;
                 const localX = col * colSpacing + offsetX - (hexRings - 1) * colSpacing / 2;
                 const localZ = row * rowSpacing - (Math.ceil(objectCount / hexRings) - 1) * rowSpacing / 2;
-                const tiltAngle = Math.PI / 4;
+                const tiltAngle = planeTilt;
                 positions.push({
                     x: localX,
                     y: -localZ * Math.sin(tiltAngle),

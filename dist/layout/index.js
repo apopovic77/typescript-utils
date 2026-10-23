@@ -18,6 +18,8 @@
  * });
  * ```
  */
+// Types
+export { DEFAULT_PLANE_TILT } from './types';
 // High-level API
 export { Layouters } from './Layouters';
 // Lower-level building blocks (for advanced use)

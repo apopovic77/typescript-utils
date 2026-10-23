@@ -14,5 +14,5 @@ export declare class Orientation {
      *
      * @returns Vec3 with Euler angles (x, y, z) in radians.
      */
-    static calculateOrientationEuler(tangent: Vec3, normal: Vec3, binormal: Vec3, _position: Vec3, orientation: OrientationMode, upMode: UpVectorMode, pathType: PathType): Vec3;
+    static calculateOrientationEuler(tangent: Vec3, normal: Vec3, binormal: Vec3, _position: Vec3, orientation: OrientationMode, upMode: UpVectorMode, pathType: PathType, planeTilt?: number): Vec3;
 }
